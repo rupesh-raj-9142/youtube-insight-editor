@@ -113,6 +113,12 @@ export interface StudioState {
   futureWatchHoursTarget: string;
   futureShortsViews: string;
   futureShortsViewsTarget: string;
+
+  videoUploadsPct?: number;
+  watchHoursPct?: number;
+  shortsViewsPct?: number;
+  futureWatchHoursPct?: number;
+  futureShortsViewsPct?: number;
 }
 
 const getDefaultState = (): StudioState => ({

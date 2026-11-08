@@ -1,3 +1,4 @@
+import { useRef, useState } from "react";
 import type { ComponentType, ReactNode } from "react";
 import {
   ChevronRight,
@@ -7,6 +8,7 @@ import {
   MessagesSquare,
   RectangleEllipsis,
 } from "lucide-react";
+import { cn } from "@/lib/utils";
 import { Card, SwipeCarousel } from "./ui";
 import { useStudioStore } from "./store";
 import { EditableText } from "./editable";
@@ -37,26 +39,151 @@ function MilestoneLock({ label }: { label: string }) {
   );
 }
 
+function parseValue(val: string): number {
+  if (!val) return 0;
+  const clean = val.replace(/,/g, "").trim().toLowerCase();
+  if (clean.endsWith("m")) {
+    return parseFloat(clean) * 1_000_000;
+  }
+  if (clean.endsWith("k")) {
+    return parseFloat(clean) * 1_000;
+  }
+  const n = parseFloat(clean);
+  return isNaN(n) ? 0 : n;
+}
+
 function Meter({
   label,
   period,
   target,
-  pct,
+  currentVal,
+  targetVal,
+  pct: fallbackPct = 0,
+  customPct,
+  onPctChange,
 }: {
   label: ReactNode;
   period: string;
   target: ReactNode;
-  pct: number;
+  currentVal?: string | undefined;
+  targetVal?: string | undefined;
+  pct?: number | undefined;
+  customPct?: number | undefined;
+  onPctChange?: ((val: number | undefined) => void) | undefined;
 }) {
+  const { editMode } = useStudioStore();
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [isDragging, setIsDragging] = useState(false);
+
+  // Auto-calculate progress percentage from current and target values
+  const autoPct = (() => {
+    if (customPct !== undefined) return customPct;
+    if (currentVal && targetVal) {
+      const c = parseValue(currentVal);
+      const t = parseValue(targetVal);
+      if (t > 0) {
+        return Math.min(100, Math.max(0, (c / t) * 100));
+      }
+    }
+    return fallbackPct;
+  })();
+
+  const updatePctFromPointer = (e: React.PointerEvent) => {
+    if (!trackRef.current || !onPctChange) return;
+    const rect = trackRef.current.getBoundingClientRect();
+    const x = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+    const newPct = Math.round((x / rect.width) * 100);
+    onPctChange(newPct);
+  };
+
+  const handlePointerDown = (e: React.PointerEvent) => {
+    if (!editMode || !onPctChange || !trackRef.current) return;
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
+    (e.target as Element).setPointerCapture(e.pointerId);
+    updatePctFromPointer(e);
+  };
+
+  const handlePointerMove = (e: React.PointerEvent) => {
+    if (!isDragging) return;
+    e.preventDefault();
+    updatePctFromPointer(e);
+  };
+
+  const handlePointerUp = (e: React.PointerEvent) => {
+    if (isDragging) {
+      setIsDragging(false);
+      try {
+        (e.target as Element).releasePointerCapture(e.pointerId);
+      } catch {}
+    }
+  };
+
+  const roundedPct = Math.round(autoPct * 10) / 10;
+
   return (
     <div>
-      <div className="h-[8px] w-full rounded-full bg-muted">
+      {/* Progress Track */}
+      <div className="relative py-1">
         <div
-          className="h-full rounded-full bg-ytlink"
-          style={{ width: pct > 0 ? `${Math.max(pct, 1.2)}%` : "0%" }}
-        />
+          ref={trackRef}
+          onPointerDown={handlePointerDown}
+          onPointerMove={handlePointerMove}
+          onPointerUp={handlePointerUp}
+          className={cn(
+            "relative h-[8px] w-full rounded-full bg-muted/80 overflow-visible transition-colors select-none",
+            editMode && "cursor-pointer hover:bg-muted touch-none"
+          )}
+        >
+          {/* Active Blue Fill */}
+          <div
+            className="h-full rounded-full bg-ytlink transition-all duration-75 relative"
+            style={{ width: `${Math.min(100, Math.max(0, roundedPct))}%` }}
+          >
+            {/* Interactive draggable handle in Edit Mode */}
+            {editMode && (
+              <div className="absolute right-0 top-1/2 -translate-y-1/2 translate-x-1/2 size-4.5 rounded-full bg-white border-2 border-ytlink shadow-md cursor-grab active:cursor-grabbing hover:scale-125 transition-transform flex items-center justify-center pointer-events-none">
+                <div className="size-1.5 rounded-full bg-ytlink" />
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Edit Mode Toolbar & Presets */}
+        {editMode && (
+          <div className="mt-2 flex items-center justify-between text-[11px] text-muted-foreground flex-wrap gap-1">
+            <span className="flex items-center gap-1 font-semibold text-blue-600 dark:text-blue-400">
+              <span className="size-1.5 rounded-full bg-blue-500 animate-pulse" />
+              Progress: {roundedPct}%
+            </span>
+            <div className="flex items-center gap-1">
+              {[0, 25, 50, 75, 100].map((p) => (
+                <button
+                  key={p}
+                  type="button"
+                  onClick={() => onPctChange?.(p)}
+                  className="px-1.5 py-0.5 rounded bg-secondary hover:bg-secondary/70 text-[10.5px] font-medium"
+                >
+                  {p}%
+                </button>
+              ))}
+              {customPct !== undefined && (
+                <button
+                  type="button"
+                  onClick={() => onPctChange?.(undefined as any)}
+                  className="px-1.5 py-0.5 rounded text-[10.5px] text-muted-foreground hover:text-foreground underline"
+                  title="Auto-calculate from numbers"
+                >
+                  Auto
+                </button>
+              )}
+            </div>
+          </div>
+        )}
       </div>
-      <div className="mt-3 flex items-baseline justify-between gap-3">
+
+      <div className="mt-2 flex items-baseline justify-between gap-3">
         <span className="text-[17px] font-medium">{label}</span>
         <span className="shrink-0 text-[17px] text-muted-foreground">{target}</span>
       </div>
@@ -163,6 +290,10 @@ export function EarnScreen() {
                 onSave={(val) => updateField("videoUploadsTarget", val)}
               />
             }
+            currentVal={state.videoUploads}
+            targetVal={state.videoUploadsTarget}
+            customPct={state.videoUploadsPct}
+            onPctChange={(val) => updateField("videoUploadsPct", val)}
             pct={33}
           />
         </div>
@@ -185,6 +316,10 @@ export function EarnScreen() {
                 onSave={(val) => updateField("watchHoursTarget", val)}
               />
             }
+            currentVal={state.watchHours}
+            targetVal={state.watchHoursTarget}
+            customPct={state.watchHoursPct}
+            onPctChange={(val) => updateField("watchHoursPct", val)}
             pct={0}
           />
         </div>
@@ -206,6 +341,10 @@ export function EarnScreen() {
                 onSave={(val) => updateField("shortsViewsTarget", val)}
               />
             }
+            currentVal={state.shortsViews}
+            targetVal={state.shortsViewsTarget}
+            customPct={state.shortsViewsPct}
+            onPctChange={(val) => updateField("shortsViewsPct", val)}
             pct={0.6}
           />
         </div>
@@ -274,6 +413,10 @@ export function EarnScreen() {
                 onSave={(val) => updateField("futureWatchHoursTarget", val)}
               />
             }
+            currentVal={state.futureWatchHours}
+            targetVal={state.futureWatchHoursTarget}
+            customPct={state.futureWatchHoursPct}
+            onPctChange={(val) => updateField("futureWatchHoursPct", val)}
             pct={0}
           />
         </div>
@@ -295,6 +438,10 @@ export function EarnScreen() {
                 onSave={(val) => updateField("futureShortsViewsTarget", val)}
               />
             }
+            currentVal={state.futureShortsViews}
+            targetVal={state.futureShortsViewsTarget}
+            customPct={state.futureShortsViewsPct}
+            onPctChange={(val) => updateField("futureShortsViewsPct", val)}
             pct={0.6}
           />
         </div>
