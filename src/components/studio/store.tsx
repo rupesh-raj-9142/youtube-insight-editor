@@ -132,6 +132,23 @@ export interface StudioState {
   shortsViewsPct?: number;
   futureWatchHoursPct?: number;
   futureShortsViewsPct?: number;
+
+  // Video / Short Analytics Screen (#viral)
+  videoAnalyticsThumb: string;
+  videoAnalyticsTitle: string;
+  videoAnalyticsHeadline: string;
+  videoAnalyticsViews: string;
+  videoAnalyticsViewsPeriod: string;
+  videoAnalyticsViewsPoints: ChartPoint[];
+  videoAnalyticsShownInFeed: string;
+  videoAnalyticsShownInFeedPoints: ChartPoint[];
+  videoAnalyticsRetentionTitle: string;
+  videoAnalyticsRetentionSubtitle: string;
+  videoAnalyticsRetentionNotice: string;
+  videoAnalyticsRealtimeTitle: string;
+  videoAnalyticsRealtimeViews: string;
+  videoAnalyticsRealtimePeriod: string;
+  videoAnalyticsRealtimeNotice: string;
 }
 
 const getDefaultState = (): StudioState => ({
@@ -350,6 +367,31 @@ const getDefaultState = (): StudioState => ({
   futureWatchHoursTarget: "4,000",
   futureShortsViews: "19",
   futureShortsViewsTarget: "10m",
+
+  videoAnalyticsThumb: viral,
+  videoAnalyticsTitle: "#viral",
+  videoAnalyticsHeadline: "This Short has had 6 views since it was published",
+  videoAnalyticsViews: "6",
+  videoAnalyticsViewsPeriod: "22 days",
+  videoAnalyticsViewsPoints: [
+    [0, 0],
+    [0.01, 2],
+    [0.035, 2],
+    [0.045, 6],
+    [1, 6],
+  ],
+  videoAnalyticsShownInFeed: "0",
+  videoAnalyticsShownInFeedPoints: [
+    [0, 0],
+    [1, 0],
+  ],
+  videoAnalyticsRetentionTitle: "Audience retention",
+  videoAnalyticsRetentionSubtitle: "Average view duration · Lifetime",
+  videoAnalyticsRetentionNotice: "Not enough information to display audience retention data.",
+  videoAnalyticsRealtimeTitle: "Real time",
+  videoAnalyticsRealtimeViews: "0",
+  videoAnalyticsRealtimePeriod: "Views · 48 hours",
+  videoAnalyticsRealtimeNotice: "Nothing to show for these dates",
 });
 
 const STORAGE_KEY = "yt_studio_custom_data_v2";
@@ -369,7 +411,13 @@ interface StudioContextType {
   updateTopContent: (index: number, field: keyof ContentRowItem, value: any) => void;
   updateTopRecentVideo: (index: number, field: keyof RankedVideoItem, value: any) => void;
   updateChartPoints: (
-    key: "viewsPoints" | "watchTimePoints" | "subscribersPoints" | "audiencePoints",
+    key:
+      | "viewsPoints"
+      | "watchTimePoints"
+      | "subscribersPoints"
+      | "audiencePoints"
+      | "videoAnalyticsViewsPoints"
+      | "videoAnalyticsShownInFeedPoints",
     points: ChartPoint[]
   ) => void;
   removeVideo: (index: number) => void;
@@ -493,7 +541,13 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateChartPoints = (
-    key: "viewsPoints" | "watchTimePoints" | "subscribersPoints" | "audiencePoints",
+    key:
+      | "viewsPoints"
+      | "watchTimePoints"
+      | "subscribersPoints"
+      | "audiencePoints"
+      | "videoAnalyticsViewsPoints"
+      | "videoAnalyticsShownInFeedPoints",
     points: ChartPoint[]
   ) => {
     setState((prev) => ({ ...prev, [key]: points }));

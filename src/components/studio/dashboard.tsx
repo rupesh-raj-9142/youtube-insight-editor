@@ -16,12 +16,18 @@ function LatestCard({
   open,
   onToggle,
   onOpenRanking,
+  onOpenViews,
+  onOpenAvgViewed,
+  onOpenLikes,
 }: {
   item: LatestItem;
   index: number;
   open: boolean;
   onToggle: () => void;
   onOpenRanking?: (() => void) | undefined;
+  onOpenViews?: (() => void) | undefined;
+  onOpenAvgViewed?: (() => void) | undefined;
+  onOpenLikes?: (() => void) | undefined;
 }) {
   const { updateLatest } = useStudioStore();
 
@@ -48,7 +54,11 @@ function LatestCard({
         </div>
       </div>
       <div className="flex items-center gap-7 border-t border-b border-border/70 py-2.5">
-        <span className="flex items-center gap-2">
+        <span
+          onClick={onOpenViews}
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
+          title="View analytics for this Short"
+        >
           <StudioAnalyticsIcon className="size-[19px] text-foreground" />
           <EditableText
             value={item.views}
@@ -56,7 +66,11 @@ function LatestCard({
             className="text-[16px] font-normal"
           />
         </span>
-        <span className="flex items-center gap-2">
+        <span
+          onClick={onOpenLikes || onOpenViews}
+          className="flex items-center gap-2 cursor-pointer hover:opacity-80 transition"
+          title="View likes"
+        >
           <StudioThumbsUp className="size-[19px] text-foreground" />
           <EditableText
             value={item.likes}
@@ -103,7 +117,13 @@ function LatestCard({
               <ChevronRight className="size-4 text-muted-foreground" strokeWidth={1.8} />
             </span>
           </div>
-          <div className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70">
+          <div
+            onClick={onOpenViews}
+            className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70 cursor-pointer hover:bg-muted/40 active:bg-muted/60 transition-colors -mx-4 px-4 select-none"
+            role="button"
+            tabIndex={0}
+            title="View analytics for this Short"
+          >
             <EditableText
               value={item.viewsLabel || "Views"}
               onSave={(val) => updateLatest(index, "viewsLabel", val)}
@@ -115,7 +135,13 @@ function LatestCard({
               className="font-normal"
             />
           </div>
-          <div className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70">
+          <div
+            onClick={onOpenAvgViewed || onOpenViews}
+            className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70 cursor-pointer hover:bg-muted/40 active:bg-muted/60 transition-colors -mx-4 px-4 select-none"
+            role="button"
+            tabIndex={0}
+            title="View average percentage viewed"
+          >
             <EditableText
               value={item.avgViewedLabel || "Average percentage viewed"}
               onSave={(val) => updateLatest(index, "avgViewedLabel", val)}
@@ -127,7 +153,13 @@ function LatestCard({
               className="font-normal"
             />
           </div>
-          <div className="flex items-center justify-between py-3.5 text-[15.5px]">
+          <div
+            onClick={onOpenLikes || onOpenViews}
+            className="flex items-center justify-between py-3.5 text-[15.5px] cursor-pointer hover:bg-muted/40 active:bg-muted/60 transition-colors -mx-4 px-4 select-none"
+            role="button"
+            tabIndex={0}
+            title="View likes"
+          >
             <EditableText
               value={item.likesLabel || "Likes"}
               onSave={(val) => updateLatest(index, "likesLabel", val)}
@@ -226,7 +258,17 @@ function DashboardCommentItem({
   );
 }
 
-export function DashboardScreen({ onOpenRanking }: { onOpenRanking?: (() => void) | undefined } = {}) {
+export function DashboardScreen({
+  onOpenRanking,
+  onOpenViews,
+  onOpenAvgViewed,
+  onOpenLikes,
+}: {
+  onOpenRanking?: (() => void) | undefined;
+  onOpenViews?: (() => void) | undefined;
+  onOpenAvgViewed?: (() => void) | undefined;
+  onOpenLikes?: (() => void) | undefined;
+} = {}) {
   const { state, updateField } = useStudioStore();
   const [open, setOpen] = useState<Record<string, boolean>>({ viral: true });
 
@@ -325,6 +367,9 @@ export function DashboardScreen({ onOpenRanking }: { onOpenRanking?: (() => void
           open={!!open[item.key]}
           onToggle={() => setOpen((s) => ({ ...s, [item.key]: !s[item.key] }))}
           onOpenRanking={onOpenRanking}
+          onOpenViews={onOpenViews}
+          onOpenAvgViewed={onOpenAvgViewed}
+          onOpenLikes={onOpenLikes}
         />
       ))}
 

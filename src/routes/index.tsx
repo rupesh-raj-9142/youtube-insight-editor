@@ -7,10 +7,18 @@ import { EarnScreen } from "@/components/studio/earn";
 import { DashboardScreen } from "@/components/studio/dashboard";
 import { ContentScreen } from "@/components/studio/contentScreen";
 import { TopRecentVideosScreen } from "@/components/studio/topRecentVideos";
+import { VideoAnalyticsScreen } from "@/components/studio/videoAnalytics";
 import { StudioProvider } from "@/components/studio/store";
 import type { Tab } from "@/components/studio/tabsData";
 
-type Screen = "dashboard" | "content" | "analytics" | "community" | "earn" | "topRecentVideos";
+type Screen =
+  | "dashboard"
+  | "content"
+  | "analytics"
+  | "community"
+  | "earn"
+  | "topRecentVideos"
+  | "videoAnalytics";
 
 const NAV_TO_SCREEN: Record<string, Screen> = {
   "Dashboa...": "dashboard",
@@ -25,6 +33,7 @@ const NAV_TO_SCREEN: Record<string, Screen> = {
 const SCREEN_TO_NAV: Record<Screen, string> = {
   dashboard: "Dashboa...",
   topRecentVideos: "Dashboa...",
+  videoAnalytics: "Dashboa...",
   content: "Content",
   analytics: "Analytics",
   community: "Commun...",
@@ -62,6 +71,9 @@ function IndexWrapper() {
 function Index() {
   const [tab, setTab] = useState<Tab>("Overview");
   const [screen, setScreen] = useState<Screen>("dashboard");
+  const [videoAnalyticsTab, setVideoAnalyticsTab] = useState<
+    "Overview" | "Reach" | "Engagement" | "Audience"
+  >("Overview");
 
   const handleNav = (label: string) => {
     const next = NAV_TO_SCREEN[label];
@@ -73,7 +85,7 @@ function Index() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[480px] bg-background pb-[76px] md:border-x md:border-border">
-      {screen !== "topRecentVideos" && (
+      {screen !== "topRecentVideos" && screen !== "videoAnalytics" && (
         <StudioTopBar
           variant={
             screen === "dashboard" ? "dashboard" : screen === "content" ? "content" : "analytics"
@@ -96,10 +108,34 @@ function Index() {
               setScreen("topRecentVideos");
               window.scrollTo({ top: 0, behavior: "instant" });
             }}
+            onOpenViews={() => {
+              setVideoAnalyticsTab("Overview");
+              setScreen("videoAnalytics");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+            onOpenAvgViewed={() => {
+              setVideoAnalyticsTab("Engagement");
+              setScreen("videoAnalytics");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+            onOpenLikes={() => {
+              setVideoAnalyticsTab("Overview");
+              setScreen("videoAnalytics");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
           />
         )}
         {screen === "topRecentVideos" && (
           <TopRecentVideosScreen
+            onBack={() => {
+              setScreen("dashboard");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+          />
+        )}
+        {screen === "videoAnalytics" && (
+          <VideoAnalyticsScreen
+            initialTab={videoAnalyticsTab}
             onBack={() => {
               setScreen("dashboard");
               window.scrollTo({ top: 0, behavior: "instant" });
