@@ -175,6 +175,17 @@ export interface StudioState {
   reachTrafficOther: string;
 
   // Engagement section
+  engagedViews: string;
+  engagedViewsPeriod: string;
+  engagedViewsPoints: ChartPoint[];
+  engagementHypeTitle: string;
+  engagementHypeSubtitle: string;
+  engagementHypePoints: string;
+  engagementHypes: string;
+  engagementHowEngagedTitle: string;
+  engagementHowEngagedSubtitle: string;
+  engagementStayedToWatchPct: string;
+  engagementSwipedAwayPct: string;
   engagementWatchTime: string;
   engagementAvgViewDuration: string;
   engagementAvgPctViewed: string;
@@ -462,6 +473,23 @@ const getDefaultState = (): StudioState => ({
   reachTrafficOther: "0.0%",
 
   // Engagement
+  engagedViews: "2",
+  engagedViewsPeriod: "22 days",
+  engagedViewsPoints: [
+    [0, 0],
+    [0.01, 1],
+    [0.035, 1],
+    [0.045, 2],
+    [1, 2],
+  ],
+  engagementHypeTitle: "Hype",
+  engagementHypeSubtitle: "First 7 days",
+  engagementHypePoints: "0",
+  engagementHypes: "0",
+  engagementHowEngagedTitle: "How viewers engaged",
+  engagementHowEngagedSubtitle: "Since published",
+  engagementStayedToWatchPct: "40.0%",
+  engagementSwipedAwayPct: "60.0%",
   engagementWatchTime: "0.0",
   engagementAvgViewDuration: "0:05",
   engagementAvgPctViewed: "61.0%",
@@ -500,7 +528,8 @@ interface StudioContextType {
       | "audiencePoints"
       | "videoAnalyticsViewsPoints"
       | "videoAnalyticsShownInFeedPoints"
-      | "reachViewsPoints",
+      | "reachViewsPoints"
+      | "engagedViewsPoints",
     points: ChartPoint[]
   ) => void;
   removeVideo: (index: number) => void;
@@ -631,7 +660,8 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       | "audiencePoints"
       | "videoAnalyticsViewsPoints"
       | "videoAnalyticsShownInFeedPoints"
-      | "reachViewsPoints",
+      | "reachViewsPoints"
+      | "engagedViewsPoints",
     points: ChartPoint[]
   ) => {
     setState((prev) => ({ ...prev, [key]: points }));

@@ -454,8 +454,8 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
       {/* 3. ENGAGEMENT TAB */}
       {/* ========================================================================= */}
       {activeTab === "Engagement" && (
-        <div className="flex flex-col pt-3">
-          {/* Carousel */}
+        <div className="flex flex-col pt-3 space-y-3.5">
+          {/* Carousel with 4 dots */}
           <div className="relative">
             <div
               className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-4"
@@ -466,7 +466,32 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                 setEngagementCarouselIndex(Math.round(scrollLeft / width));
               }}
             >
-              {/* Card 1: Watch time */}
+              {/* Card 1: Engaged views (Magenta Step Graph) */}
+              <Card className="min-w-[88%] shrink-0 snap-start p-4">
+                <EditableText
+                  value="Engaged views"
+                  onSave={() => {}}
+                  className="text-[15px] text-muted-foreground font-medium block"
+                />
+                <div className="mt-0.5">
+                  <EditableText
+                    value={state.engagedViews || "2"}
+                    onSave={(val) => updateField("engagedViews", val)}
+                    className="text-[32px] font-bold text-foreground leading-none block"
+                  />
+                </div>
+                <LineChart
+                  points={state.engagedViewsPoints}
+                  onPointsChange={(pts) => updateChartPoints("engagedViewsPoints", pts)}
+                  gridlines={[0, 1, 2, 3]}
+                  colorClass="stroke-[#d92686] text-[#d92686]"
+                  xStart="0"
+                  xEnd={state.engagedViewsPeriod || "22 days"}
+                  className="mt-4"
+                />
+              </Card>
+
+              {/* Card 2: Watch time (hours) */}
               <Card className="min-w-[88%] shrink-0 snap-start p-4">
                 <EditableText
                   value="Watch time (hours)"
@@ -484,14 +509,14 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                   points={state.videoAnalyticsShownInFeedPoints}
                   onPointsChange={(pts) => updateChartPoints("videoAnalyticsShownInFeedPoints", pts)}
                   gridlines={[0, 0.5, 1]}
-                  colorClass="stroke-[#00a8e8] text-[#00a8e8]"
+                  colorClass="stroke-[#d92686] text-[#d92686]"
                   xStart="0"
-                  xEnd={state.videoAnalyticsViewsPeriod || "22 days"}
+                  xEnd={state.engagedViewsPeriod || "22 days"}
                   className="mt-4"
                 />
               </Card>
 
-              {/* Card 2: Average percentage viewed */}
+              {/* Card 3: Average percentage viewed */}
               <Card className="min-w-[88%] shrink-0 snap-start p-4">
                 <EditableText
                   value="Average percentage viewed"
@@ -516,12 +541,134 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                   </div>
                 </div>
               </Card>
+
+              {/* Card 4: Average view duration */}
+              <Card className="min-w-[88%] shrink-0 snap-start p-4">
+                <EditableText
+                  value="Average view duration"
+                  onSave={() => {}}
+                  className="text-[15px] text-muted-foreground font-medium block"
+                />
+                <div className="mt-0.5">
+                  <EditableText
+                    value={state.engagementAvgViewDuration || "0:05"}
+                    onSave={(val) => updateField("engagementAvgViewDuration", val)}
+                    className="text-[32px] font-bold text-foreground leading-none block"
+                  />
+                </div>
+                <div className="mt-4 flex flex-col gap-2 pt-2 border-t border-border/60">
+                  <div className="flex justify-between text-[14px]">
+                    <span className="text-muted-foreground">Lifetime</span>
+                    <span className="font-bold text-foreground">0:05</span>
+                  </div>
+                </div>
+              </Card>
             </div>
-            <Dots count={2} active={engagementCarouselIndex} />
+            <Dots count={4} active={engagementCarouselIndex} />
           </div>
 
-          {/* Audience retention Card */}
-          <div className="px-4 mt-2">
+          {/* Card: Hype */}
+          <div className="px-4">
+            <Card className="p-4">
+              <EditableText
+                value={state.engagementHypeTitle || "Hype"}
+                onSave={(val) => updateField("engagementHypeTitle", val)}
+                className="text-[20px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value={state.engagementHypeSubtitle || "First 7 days"}
+                onSave={(val) => updateField("engagementHypeSubtitle", val)}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              <div className="mt-5 grid grid-cols-2 gap-4">
+                <div>
+                  <EditableText
+                    value={state.engagementHypePoints || "0"}
+                    onSave={(val) => updateField("engagementHypePoints", val)}
+                    className="text-[28px] font-bold text-foreground leading-none block"
+                  />
+                  <EditableText
+                    value="Hype points"
+                    onSave={() => {}}
+                    className="text-[14px] text-muted-foreground mt-1.5 block"
+                  />
+                </div>
+                <div>
+                  <EditableText
+                    value={state.engagementHypes || "0"}
+                    onSave={(val) => updateField("engagementHypes", val)}
+                    className="text-[28px] font-bold text-foreground leading-none block"
+                  />
+                  <EditableText
+                    value="Hypes"
+                    onSave={() => {}}
+                    className="text-[14px] text-muted-foreground mt-1.5 block"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Card: How viewers engaged */}
+          <div className="px-4">
+            <Card className="p-4">
+              <EditableText
+                value={state.engagementHowEngagedTitle || "How viewers engaged"}
+                onSave={(val) => updateField("engagementHowEngagedTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value={state.engagementHowEngagedSubtitle || "Since published"}
+                onSave={(val) => updateField("engagementHowEngagedSubtitle", val)}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              {/* Segmented bar: Hot pink 40% + Light pink 60% */}
+              <div className="mt-4 flex h-3 w-full gap-[2px] overflow-hidden rounded-full">
+                <div
+                  style={{ width: state.engagementStayedToWatchPct || "40.0%" }}
+                  className="h-full bg-[#d92686] rounded-l-full"
+                />
+                <div
+                  style={{ width: state.engagementSwipedAwayPct || "60.0%" }}
+                  className="h-full bg-[#f472b6] rounded-r-full"
+                />
+              </div>
+
+              {/* Stats row below */}
+              <div className="mt-5 flex items-start justify-between">
+                <div>
+                  <EditableText
+                    value={state.engagementStayedToWatchPct || "40.0%"}
+                    onSave={(val) => updateField("engagementStayedToWatchPct", val)}
+                    className="text-[18px] font-bold text-foreground block"
+                  />
+                  <EditableText
+                    value="Stayed to watch"
+                    onSave={() => {}}
+                    className="text-[14px] text-foreground mt-0.5 block"
+                  />
+                </div>
+
+                <div className="text-right">
+                  <EditableText
+                    value={state.engagementSwipedAwayPct || "60.0%"}
+                    onSave={(val) => updateField("engagementSwipedAwayPct", val)}
+                    className="text-[18px] font-bold text-foreground block"
+                  />
+                  <EditableText
+                    value="Swiped away"
+                    onSave={() => {}}
+                    className="text-[14px] text-foreground mt-0.5 block"
+                  />
+                </div>
+              </div>
+            </Card>
+          </div>
+
+          {/* Card: Audience retention */}
+          <div className="px-4">
             <Card className="p-4">
               <EditableText
                 value={state.videoAnalyticsRetentionTitle || "Audience retention"}
@@ -531,7 +678,7 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
               <EditableText
                 value={state.videoAnalyticsRetentionSubtitle || "Average view duration · Lifetime"}
                 onSave={(val) => updateField("videoAnalyticsRetentionSubtitle", val)}
-                className="text-[14px] text-muted-foreground mt-0.5 block"
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
               />
 
               <div className="mt-4 flex items-start gap-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 p-4">
@@ -545,39 +692,6 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                   className="text-[14px] text-foreground leading-snug block"
                   multiline
                 />
-              </div>
-            </Card>
-          </div>
-
-          {/* Likes vs Dislikes Card */}
-          <div className="px-4 mt-4">
-            <Card className="p-4">
-              <h2 className="text-[18.5px] font-bold tracking-tight text-foreground">
-                Likes (vs. dislikes)
-              </h2>
-              <p className="text-[13.5px] text-muted-foreground mt-0.5">Lifetime</p>
-
-              <div className="mt-5 space-y-3">
-                <div className="flex justify-between items-center text-[15px]">
-                  <span className="font-semibold text-foreground">This Short</span>
-                  <EditableText
-                    value={state.engagementLikesPct || "100.0%"}
-                    onSave={(val) => updateField("engagementLikesPct", val)}
-                    className="font-bold tabular-nums"
-                  />
-                </div>
-                <div className="h-2 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-[#00a8e8] rounded-full w-full" />
-                </div>
-
-                <div className="flex justify-between items-center text-[14px] pt-2 text-muted-foreground">
-                  <span>Channel average</span>
-                  <EditableText
-                    value={state.engagementLikesVsChannel || "100.0%"}
-                    onSave={(val) => updateField("engagementLikesVsChannel", val)}
-                    className="font-medium tabular-nums"
-                  />
-                </div>
               </div>
             </Card>
           </div>
