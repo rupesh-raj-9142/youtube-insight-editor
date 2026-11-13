@@ -151,6 +151,22 @@ export interface StudioState {
   videoAnalyticsRealtimeNotice: string;
 
   // Reach section
+  reachViews: string;
+  reachViewsPeriod: string;
+  reachViewsPoints: ChartPoint[];
+  reachFindTitle: string;
+  reachFindSubtitle: string;
+  reachItem1Label: string;
+  reachItem1Pct: string;
+  reachItem2Label: string;
+  reachItem2Pct: string;
+  reachItem3Label: string;
+  reachItem3Pct: string;
+  reachExternalTitle: string;
+  reachSearchTermsTitle: string;
+  reachSuggestingTitle: string;
+  reachPlaylistsTitle: string;
+  reachNoTrafficNotice: string;
   reachShownInFeed: string;
   reachViewedPct: string;
   reachSwipedAwayPct: string;
@@ -416,6 +432,28 @@ const getDefaultState = (): StudioState => ({
   videoAnalyticsRealtimeNotice: "Nothing to show for these dates",
 
   // Reach
+  reachViews: "6",
+  reachViewsPeriod: "22 days",
+  reachViewsPoints: [
+    [0, 0],
+    [0.01, 2],
+    [0.035, 2],
+    [0.045, 6],
+    [1, 6],
+  ],
+  reachFindTitle: "How viewers find this video",
+  reachFindSubtitle: "Views · Since published",
+  reachItem1Label: "Notifications",
+  reachItem1Pct: "66.7%",
+  reachItem2Label: "Channel pages",
+  reachItem2Pct: "16.7%",
+  reachItem3Label: "Shorts feed",
+  reachItem3Pct: "16.7%",
+  reachExternalTitle: "External sites or apps",
+  reachSearchTermsTitle: "YouTube search terms",
+  reachSuggestingTitle: "Content suggesting this Short",
+  reachPlaylistsTitle: "Playlists featuring this Short",
+  reachNoTrafficNotice: "Not enough traffic data to show this report",
   reachShownInFeed: "0",
   reachViewedPct: "100.0%",
   reachSwipedAwayPct: "0.0%",
@@ -461,7 +499,8 @@ interface StudioContextType {
       | "subscribersPoints"
       | "audiencePoints"
       | "videoAnalyticsViewsPoints"
-      | "videoAnalyticsShownInFeedPoints",
+      | "videoAnalyticsShownInFeedPoints"
+      | "reachViewsPoints",
     points: ChartPoint[]
   ) => void;
   removeVideo: (index: number) => void;
@@ -591,7 +630,8 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       | "subscribersPoints"
       | "audiencePoints"
       | "videoAnalyticsViewsPoints"
-      | "videoAnalyticsShownInFeedPoints",
+      | "videoAnalyticsShownInFeedPoints"
+      | "reachViewsPoints",
     points: ChartPoint[]
   ) => {
     setState((prev) => ({ ...prev, [key]: points }));

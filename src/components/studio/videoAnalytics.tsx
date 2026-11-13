@@ -22,7 +22,6 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
   const { state, updateField, updateChartPoints } = useStudioStore();
   const [activeTab, setActiveTab] = useState<"Overview" | "Reach" | "Engagement" | "Audience">(initialTab);
   const [overviewCarouselIndex, setOverviewCarouselIndex] = useState(0);
-  const [reachCarouselIndex, setReachCarouselIndex] = useState(0);
   const [engagementCarouselIndex, setEngagementCarouselIndex] = useState(0);
   const [audienceCarouselIndex, setAudienceCarouselIndex] = useState(0);
 
@@ -238,151 +237,213 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
       {/* 2. REACH TAB */}
       {/* ========================================================================= */}
       {activeTab === "Reach" && (
-        <div className="flex flex-col pt-3">
-          {/* Carousel */}
-          <div className="relative">
-            <div
-              className="no-scrollbar flex snap-x snap-mandatory gap-3 overflow-x-auto px-4"
-              onScroll={(e) => {
-                const el = e.currentTarget;
-                const scrollLeft = el.scrollLeft;
-                const width = el.clientWidth * 0.8;
-                setReachCarouselIndex(Math.round(scrollLeft / width));
-              }}
-            >
-              {/* Card 1: Shown in feed */}
-              <Card className="min-w-[88%] shrink-0 snap-start p-4">
+        <div className="flex flex-col pt-3 space-y-3.5">
+          {/* Card 1: Views (Purple/Indigo Step Graph) */}
+          <div className="px-4">
+            <Card className="p-4">
+              <EditableText
+                value="Views"
+                onSave={() => {}}
+                className="text-[15px] text-muted-foreground font-medium block"
+              />
+              <div className="mt-0.5">
                 <EditableText
-                  value="Shown in feed"
-                  onSave={() => {}}
-                  className="text-[15px] text-muted-foreground font-medium block"
+                  value={state.reachViews || "6"}
+                  onSave={(val) => updateField("reachViews", val)}
+                  className="text-[32px] font-bold text-foreground leading-none block"
                 />
-                <div className="mt-0.5">
-                  <EditableText
-                    value={state.reachShownInFeed || "0"}
-                    onSave={(val) => updateField("reachShownInFeed", val)}
-                    className="text-[32px] font-bold text-foreground leading-none block"
-                  />
-                </div>
-                <LineChart
-                  points={state.videoAnalyticsShownInFeedPoints}
-                  onPointsChange={(pts) => updateChartPoints("videoAnalyticsShownInFeedPoints", pts)}
-                  gridlines={[0, 1, 2, 3]}
-                  colorClass="stroke-[#00a8e8] text-[#00a8e8]"
-                  xStart="0"
-                  xEnd={state.videoAnalyticsViewsPeriod || "22 days"}
-                  className="mt-4"
-                />
-              </Card>
-
-              {/* Card 2: How many chose to view */}
-              <Card className="min-w-[88%] shrink-0 snap-start p-4">
-                <h3 className="text-[16px] font-bold text-foreground">How many chose to view</h3>
-                <p className="text-[13px] text-muted-foreground mt-0.5">Lifetime</p>
-
-                <div className="mt-5 space-y-4">
-                  <div>
-                    <div className="flex justify-between text-[14.5px] font-medium mb-1.5">
-                      <span>Viewed</span>
-                      <EditableText
-                        value={state.reachViewedPct || "100.0%"}
-                        onSave={(val) => updateField("reachViewedPct", val)}
-                        className="font-bold"
-                      />
-                    </div>
-                    <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-[#00a8e8] rounded-full w-full" />
-                    </div>
-                  </div>
-
-                  <div>
-                    <div className="flex justify-between text-[14.5px] font-medium mb-1.5">
-                      <span>Swiped away</span>
-                      <EditableText
-                        value={state.reachSwipedAwayPct || "0.0%"}
-                        onSave={(val) => updateField("reachSwipedAwayPct", val)}
-                        className="font-bold text-muted-foreground"
-                      />
-                    </div>
-                    <div className="h-3 w-full rounded-full bg-muted overflow-hidden">
-                      <div className="h-full bg-muted-foreground/30 rounded-full w-0" />
-                    </div>
-                  </div>
-                </div>
-              </Card>
-            </div>
-            <Dots count={2} active={reachCarouselIndex} />
+              </div>
+              <LineChart
+                points={state.reachViewsPoints || state.videoAnalyticsViewsPoints}
+                onPointsChange={(pts) => updateChartPoints("reachViewsPoints", pts)}
+                gridlines={[0, 2, 4, 6]}
+                colorClass="stroke-[#5856d6] text-[#5856d6]"
+                xStart="0"
+                xEnd={state.reachViewsPeriod || "22 days"}
+                className="mt-4"
+              />
+            </Card>
           </div>
 
-          {/* Traffic Sources */}
-          <div className="px-4 mt-2">
+          {/* Card 2: How viewers find this video */}
+          <div className="px-4">
             <Card className="p-4">
-              <h2 className="text-[18.5px] font-bold tracking-tight text-foreground">
-                How viewers find this Short
-              </h2>
-              <p className="text-[13.5px] text-muted-foreground mt-0.5">Views · Lifetime</p>
+              <EditableText
+                value={state.reachFindTitle || "How viewers find this video"}
+                onSave={(val) => updateField("reachFindTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value={state.reachFindSubtitle || "Views · Since published"}
+                onSave={(val) => updateField("reachFindSubtitle", val)}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
 
-              <div className="mt-4 space-y-3.5">
-                <div className="flex items-center justify-between text-[14.5px]">
-                  <span className="text-foreground">Channel pages</span>
+              {/* Horizontal segmented bar */}
+              <div className="mt-4 flex h-3 w-full gap-[2px] overflow-hidden rounded-full">
+                <div
+                  style={{ width: state.reachItem1Pct || "66.7%" }}
+                  className="h-full bg-[#1e1b4b] dark:bg-[#312e81] rounded-l-full"
+                />
+                <div
+                  style={{ width: state.reachItem2Pct || "16.7%" }}
+                  className="h-full bg-[#5856d6]"
+                />
+                <div
+                  style={{ width: state.reachItem3Pct || "16.7%" }}
+                  className="h-full bg-[#9896ee] rounded-r-full"
+                />
+              </div>
+
+              {/* Legend rows */}
+              <div className="mt-5 space-y-3.5">
+                <div className="flex items-center justify-between text-[15px]">
+                  <div className="flex items-center gap-2.5">
+                    <span className="size-2.5 rounded-full bg-[#1e1b4b] dark:bg-[#312e81] shrink-0" />
+                    <EditableText
+                      value={state.reachItem1Label || "Notifications"}
+                      onSave={(val) => updateField("reachItem1Label", val)}
+                      className="text-foreground"
+                    />
+                  </div>
                   <EditableText
-                    value={state.reachTrafficChannelPages || "66.7%"}
-                    onSave={(val) => updateField("reachTrafficChannelPages", val)}
-                    className="font-semibold tabular-nums"
+                    value={state.reachItem1Pct || "66.7%"}
+                    onSave={(val) => updateField("reachItem1Pct", val)}
+                    className="font-bold tabular-nums text-foreground"
                   />
                 </div>
-                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-[#00a8e8] rounded-full w-[66.7%]" />
-                </div>
 
-                <div className="flex items-center justify-between text-[14.5px] pt-1">
-                  <span className="text-foreground">Shorts feed</span>
+                <div className="flex items-center justify-between text-[15px]">
+                  <div className="flex items-center gap-2.5">
+                    <span className="size-2.5 rounded-full bg-[#5856d6] shrink-0" />
+                    <EditableText
+                      value={state.reachItem2Label || "Channel pages"}
+                      onSave={(val) => updateField("reachItem2Label", val)}
+                      className="text-foreground"
+                    />
+                  </div>
                   <EditableText
-                    value={state.reachTrafficShortsFeed || "33.3%"}
-                    onSave={(val) => updateField("reachTrafficShortsFeed", val)}
-                    className="font-semibold tabular-nums"
+                    value={state.reachItem2Pct || "16.7%"}
+                    onSave={(val) => updateField("reachItem2Pct", val)}
+                    className="font-bold tabular-nums text-foreground"
                   />
                 </div>
-                <div className="h-1.5 w-full bg-muted rounded-full overflow-hidden">
-                  <div className="h-full bg-sky-400 rounded-full w-[33.3%]" />
-                </div>
 
-                <div className="flex items-center justify-between text-[14.5px] pt-1">
-                  <span className="text-foreground">Other YouTube features</span>
+                <div className="flex items-center justify-between text-[15px]">
+                  <div className="flex items-center gap-2.5">
+                    <span className="size-2.5 rounded-full bg-[#9896ee] shrink-0" />
+                    <EditableText
+                      value={state.reachItem3Label || "Shorts feed"}
+                      onSave={(val) => updateField("reachItem3Label", val)}
+                      className="text-foreground"
+                    />
+                  </div>
                   <EditableText
-                    value={state.reachTrafficOther || "0.0%"}
-                    onSave={(val) => updateField("reachTrafficOther", val)}
-                    className="font-semibold tabular-nums text-muted-foreground"
+                    value={state.reachItem3Pct || "16.7%"}
+                    onSave={(val) => updateField("reachItem3Pct", val)}
+                    className="font-bold tabular-nums text-foreground"
                   />
                 </div>
               </div>
             </Card>
           </div>
 
-          {/* YouTube Search terms */}
-          <div className="px-4 mt-4">
+          {/* Card 3: External sites or apps */}
+          <div className="px-4">
             <Card className="p-4">
-              <h2 className="text-[18px] font-bold tracking-tight text-foreground">
-                YouTube search terms
-              </h2>
-              <p className="text-[13.5px] text-muted-foreground mt-0.5">Views · Lifetime</p>
-              <div className="mt-6 mb-2 flex items-center gap-3 text-muted-foreground text-[14.5px]">
-                <Clock className="size-5 shrink-0" strokeWidth={1.8} />
-                <span>Not enough traffic data to show this report</span>
+              <EditableText
+                value={state.reachExternalTitle || "External sites or apps"}
+                onSave={(val) => updateField("reachExternalTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value="Views · Since published"
+                onSave={() => {}}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 p-4">
+                <Info className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.8} />
+                <EditableText
+                  value={state.reachNoTrafficNotice || "Not enough traffic data to show this report"}
+                  onSave={(val) => updateField("reachNoTrafficNotice", val)}
+                  className="text-[14px] text-foreground block"
+                />
               </div>
             </Card>
           </div>
 
-          {/* External sites or apps */}
-          <div className="px-4 mt-4">
+          {/* Card 4: YouTube search terms */}
+          <div className="px-4">
             <Card className="p-4">
-              <h2 className="text-[18px] font-bold tracking-tight text-foreground">
-                External sites or apps
-              </h2>
-              <p className="text-[13.5px] text-muted-foreground mt-0.5">Views · Lifetime</p>
-              <div className="mt-6 mb-2 flex items-center gap-3 text-muted-foreground text-[14.5px]">
-                <Clock className="size-5 shrink-0" strokeWidth={1.8} />
-                <span>Not enough traffic data to show this report</span>
+              <EditableText
+                value={state.reachSearchTermsTitle || "YouTube search terms"}
+                onSave={(val) => updateField("reachSearchTermsTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value="Views · Since published"
+                onSave={() => {}}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 p-4">
+                <Info className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.8} />
+                <EditableText
+                  value={state.reachNoTrafficNotice || "Not enough traffic data to show this report"}
+                  onSave={(val) => updateField("reachNoTrafficNotice", val)}
+                  className="text-[14px] text-foreground block"
+                />
+              </div>
+            </Card>
+          </div>
+
+          {/* Card 5: Content suggesting this Short */}
+          <div className="px-4">
+            <Card className="p-4">
+              <EditableText
+                value={state.reachSuggestingTitle || "Content suggesting this Short"}
+                onSave={(val) => updateField("reachSuggestingTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value="Views · Since published"
+                onSave={() => {}}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 p-4">
+                <Info className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.8} />
+                <EditableText
+                  value={state.reachNoTrafficNotice || "Not enough traffic data to show this report"}
+                  onSave={(val) => updateField("reachNoTrafficNotice", val)}
+                  className="text-[14px] text-foreground block"
+                />
+              </div>
+            </Card>
+          </div>
+
+          {/* Card 6: Playlists featuring this Short */}
+          <div className="px-4">
+            <Card className="p-4">
+              <EditableText
+                value={state.reachPlaylistsTitle || "Playlists featuring this Short"}
+                onSave={(val) => updateField("reachPlaylistsTitle", val)}
+                className="text-[18.5px] font-bold tracking-tight text-foreground block"
+              />
+              <EditableText
+                value="Views · Since published"
+                onSave={() => {}}
+                className="text-[13.5px] text-muted-foreground mt-0.5 block"
+              />
+
+              <div className="mt-4 flex items-center gap-3 rounded-xl bg-zinc-100 dark:bg-zinc-800/60 p-4">
+                <Info className="size-5 shrink-0 text-muted-foreground" strokeWidth={1.8} />
+                <EditableText
+                  value={state.reachNoTrafficNotice || "Not enough traffic data to show this report"}
+                  onSave={(val) => updateField("reachNoTrafficNotice", val)}
+                  className="text-[14px] text-foreground block"
+                />
               </div>
             </Card>
           </div>
