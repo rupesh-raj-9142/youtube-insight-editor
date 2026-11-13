@@ -63,6 +63,14 @@ export interface ContentRowItem {
   views: string;
 }
 
+export interface RankedVideoItem {
+  rank: string;
+  thumb: string;
+  title: string;
+  views: string;
+  isCurrent?: boolean;
+}
+
 export interface StudioState {
   channelAvatar: string;
   channelName: string;
@@ -80,6 +88,11 @@ export interface StudioState {
 
   latestPublished: LatestItem[];
   dashboardComments: CommentItemData[];
+
+  topRecentVideosTitle: string;
+  topRecentVideosPeriod: string;
+  topRecentVideosSubtitle: string;
+  topRecentVideos: RankedVideoItem[];
 
   videos: MediaItem[];
   shorts: MediaItem[];
@@ -205,6 +218,22 @@ const getDefaultState = (): StudioState => ({
       when: "3 yr ago",
       text: "Don't judge the power of girl",
     },
+  ],
+
+  topRecentVideosTitle: "Top recent videos",
+  topRecentVideosPeriod: "First 22 days, 8 hours",
+  topRecentVideosSubtitle: "Comparing views of previous 10 Shorts",
+  topRecentVideos: [
+    { rank: "1", thumb: t3, title: "always be positive", views: "16.7k" },
+    { rank: "2", thumb: t2, title: "18 July 2025", views: "620" },
+    { rank: "3", thumb: motiv, title: "#motivational #power", views: "598" },
+    { rank: "4", thumb: studyias, title: "22 May 2025", views: "151" },
+    { rank: "5", thumb: asus, title: "why time is everything", views: "119" },
+    { rank: "6", thumb: studyvlog, title: "true line says", views: "115" },
+    { rank: "7", thumb: police, title: "#power of ias officer", views: "107" },
+    { rank: "8", thumb: t4, title: "only four lines ..full of motivati...", views: "9" },
+    { rank: "9", thumb: viral, title: "#viral", views: "6", isCurrent: true },
+    { rank: "9", thumb: chill, title: "15 July 2026", views: "6" },
   ],
 
   videos: [
@@ -338,6 +367,7 @@ interface StudioContextType {
   updateDashboardComment: (index: number, field: keyof CommentItemData, value: any) => void;
   updateCommunityComment: (index: number, field: keyof CommentItemData, value: any) => void;
   updateTopContent: (index: number, field: keyof ContentRowItem, value: any) => void;
+  updateTopRecentVideo: (index: number, field: keyof RankedVideoItem, value: any) => void;
   updateChartPoints: (
     key: "viewsPoints" | "watchTimePoints" | "subscribersPoints" | "audiencePoints",
     points: ChartPoint[]
@@ -453,6 +483,15 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
     });
   };
 
+  const updateTopRecentVideo = (index: number, field: keyof RankedVideoItem, value: any) => {
+    setState((prev) => {
+      const copy = [...prev.topRecentVideos];
+      const current = copy[index];
+      if (current) copy[index] = { ...current, [field]: value } as RankedVideoItem;
+      return { ...prev, topRecentVideos: copy };
+    });
+  };
+
   const updateChartPoints = (
     key: "viewsPoints" | "watchTimePoints" | "subscribersPoints" | "audiencePoints",
     points: ChartPoint[]
@@ -532,6 +571,7 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
         updateDashboardComment,
         updateCommunityComment,
         updateTopContent,
+        updateTopRecentVideo,
         updateChartPoints,
         removeVideo,
         removeShort,

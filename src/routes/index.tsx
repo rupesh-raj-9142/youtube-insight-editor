@@ -6,10 +6,11 @@ import { CommunityScreen } from "@/components/studio/community";
 import { EarnScreen } from "@/components/studio/earn";
 import { DashboardScreen } from "@/components/studio/dashboard";
 import { ContentScreen } from "@/components/studio/contentScreen";
+import { TopRecentVideosScreen } from "@/components/studio/topRecentVideos";
 import { StudioProvider } from "@/components/studio/store";
 import type { Tab } from "@/components/studio/tabsData";
 
-type Screen = "dashboard" | "content" | "analytics" | "community" | "earn";
+type Screen = "dashboard" | "content" | "analytics" | "community" | "earn" | "topRecentVideos";
 
 const NAV_TO_SCREEN: Record<string, Screen> = {
   "Dashboa...": "dashboard",
@@ -23,6 +24,7 @@ const NAV_TO_SCREEN: Record<string, Screen> = {
 
 const SCREEN_TO_NAV: Record<Screen, string> = {
   dashboard: "Dashboa...",
+  topRecentVideos: "Dashboa...",
   content: "Content",
   analytics: "Analytics",
   community: "Commun...",
@@ -71,11 +73,13 @@ function Index() {
 
   return (
     <div className="mx-auto min-h-screen max-w-[480px] bg-background pb-[76px] md:border-x md:border-border">
-      <StudioTopBar
-        variant={
-          screen === "dashboard" ? "dashboard" : screen === "content" ? "content" : "analytics"
-        }
-      />
+      {screen !== "topRecentVideos" && (
+        <StudioTopBar
+          variant={
+            screen === "dashboard" ? "dashboard" : screen === "content" ? "content" : "analytics"
+          }
+        />
+      )}
       {screen === "analytics" ? <TabsBar active={tab} onChange={setTab} /> : null}
       <main>
         {screen === "analytics" && (
@@ -86,7 +90,22 @@ function Index() {
             {tab === "Trends" && <TrendsTab />}
           </>
         )}
-        {screen === "dashboard" && <DashboardScreen />}
+        {screen === "dashboard" && (
+          <DashboardScreen
+            onOpenRanking={() => {
+              setScreen("topRecentVideos");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+          />
+        )}
+        {screen === "topRecentVideos" && (
+          <TopRecentVideosScreen
+            onBack={() => {
+              setScreen("dashboard");
+              window.scrollTo({ top: 0, behavior: "instant" });
+            }}
+          />
+        )}
         {screen === "content" && <ContentScreen />}
         {screen === "community" && <CommunityScreen />}
         {screen === "earn" && <EarnScreen />}

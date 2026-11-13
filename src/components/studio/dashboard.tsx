@@ -15,11 +15,13 @@ function LatestCard({
   index,
   open,
   onToggle,
+  onOpenRanking,
 }: {
   item: LatestItem;
   index: number;
   open: boolean;
   onToggle: () => void;
+  onOpenRanking?: (() => void) | undefined;
 }) {
   const { updateLatest } = useStudioStore();
 
@@ -80,7 +82,13 @@ function LatestCard({
       </div>
       {open ? (
         <div>
-          <div className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70">
+          <div
+            onClick={onOpenRanking}
+            className="flex items-center justify-between py-3.5 text-[15.5px] border-b border-border/70 cursor-pointer hover:bg-muted/40 active:bg-muted/60 transition-colors -mx-4 px-4 select-none"
+            role="button"
+            tabIndex={0}
+            title="View top recent videos ranking"
+          >
             <EditableText
               value={item.rankingLabel || "Ranking by views"}
               onSave={(val) => updateLatest(index, "rankingLabel", val)}
@@ -218,7 +226,7 @@ function DashboardCommentItem({
   );
 }
 
-export function DashboardScreen() {
+export function DashboardScreen({ onOpenRanking }: { onOpenRanking?: (() => void) | undefined } = {}) {
   const { state, updateField } = useStudioStore();
   const [open, setOpen] = useState<Record<string, boolean>>({ viral: true });
 
@@ -316,6 +324,7 @@ export function DashboardScreen() {
           index={idx}
           open={!!open[item.key]}
           onToggle={() => setOpen((s) => ({ ...s, [item.key]: !s[item.key] }))}
+          onOpenRanking={onOpenRanking}
         />
       ))}
 
