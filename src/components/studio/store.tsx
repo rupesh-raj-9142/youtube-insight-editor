@@ -149,6 +149,28 @@ export interface StudioState {
   videoAnalyticsRealtimeViews: string;
   videoAnalyticsRealtimePeriod: string;
   videoAnalyticsRealtimeNotice: string;
+
+  // Reach section
+  reachShownInFeed: string;
+  reachViewedPct: string;
+  reachSwipedAwayPct: string;
+  reachTrafficChannelPages: string;
+  reachTrafficShortsFeed: string;
+  reachTrafficOther: string;
+
+  // Engagement section
+  engagementWatchTime: string;
+  engagementAvgViewDuration: string;
+  engagementAvgPctViewed: string;
+  engagementLikesPct: string;
+  engagementLikesVsChannel: string;
+
+  // Audience section
+  audienceReturningViewers: string;
+  audienceUniqueViewers: string;
+  audienceSubscribersGained: string;
+  audienceWatchTimeNotSubscribed: string;
+  audienceWatchTimeSubscribed: string;
 }
 
 const getDefaultState = (): StudioState => ({
@@ -392,6 +414,28 @@ const getDefaultState = (): StudioState => ({
   videoAnalyticsRealtimeViews: "0",
   videoAnalyticsRealtimePeriod: "Views · 48 hours",
   videoAnalyticsRealtimeNotice: "Nothing to show for these dates",
+
+  // Reach
+  reachShownInFeed: "0",
+  reachViewedPct: "100.0%",
+  reachSwipedAwayPct: "0.0%",
+  reachTrafficChannelPages: "66.7%",
+  reachTrafficShortsFeed: "33.3%",
+  reachTrafficOther: "0.0%",
+
+  // Engagement
+  engagementWatchTime: "0.0",
+  engagementAvgViewDuration: "0:05",
+  engagementAvgPctViewed: "61.0%",
+  engagementLikesPct: "100.0%",
+  engagementLikesVsChannel: "100.0%",
+
+  // Audience
+  audienceReturningViewers: "0",
+  audienceUniqueViewers: "5",
+  audienceSubscribersGained: "+0",
+  audienceWatchTimeNotSubscribed: "100.0%",
+  audienceWatchTimeSubscribed: "0.0%",
 });
 
 const STORAGE_KEY = "yt_studio_custom_data_v2";
