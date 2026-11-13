@@ -491,7 +491,34 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                 />
               </Card>
 
-              {/* Card 2: Watch time (hours) */}
+              {/* Card 2: Unique viewers */}
+              <Card className="min-w-[88%] shrink-0 snap-start p-4">
+                <EditableText
+                  value="Unique viewers"
+                  onSave={() => {}}
+                  className="text-[15px] text-muted-foreground font-medium block"
+                />
+                <div className="mt-0.5 flex items-center gap-1.5">
+                  <EditableText
+                    value={state.engagedUniqueViewers || "2"}
+                    onSave={(val) => updateField("engagedUniqueViewers", val)}
+                    className="text-[32px] font-bold text-foreground leading-none block"
+                  />
+                  <Clock className="size-5 text-muted-foreground stroke-[1.8]" />
+                </div>
+                <LineChart
+                  points={state.engagedUniqueViewersPoints}
+                  onPointsChange={(pts) => updateChartPoints("engagedUniqueViewersPoints", pts)}
+                  gridlines={[0, 1, 2, 3]}
+                  shadeFrom={0.88}
+                  colorClass="stroke-[#d92686] text-[#d92686]"
+                  xStart={state.engagedUniqueViewersXStart || "20 Oct"}
+                  xEnd={state.engagedUniqueViewersXEnd || "12 Nov"}
+                  className="mt-4"
+                />
+              </Card>
+
+              {/* Card 3: Watch time (hours) */}
               <Card className="min-w-[88%] shrink-0 snap-start p-4">
                 <EditableText
                   value="Watch time (hours)"
@@ -500,46 +527,21 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                 />
                 <div className="mt-0.5">
                   <EditableText
-                    value={state.engagementWatchTime || "0.0"}
-                    onSave={(val) => updateField("engagementWatchTime", val)}
+                    value={state.engagedWatchTime || "0.0"}
+                    onSave={(val) => updateField("engagedWatchTime", val)}
                     className="text-[32px] font-bold text-foreground leading-none block"
                   />
                 </div>
                 <LineChart
-                  points={state.videoAnalyticsShownInFeedPoints}
-                  onPointsChange={(pts) => updateChartPoints("videoAnalyticsShownInFeedPoints", pts)}
-                  gridlines={[0, 0.5, 1]}
+                  points={state.engagedWatchTimePoints}
+                  onPointsChange={(pts) => updateChartPoints("engagedWatchTimePoints", pts)}
+                  gridlines={[0, 1, 2, 3]}
+                  gridLabel={() => "0.0"}
                   colorClass="stroke-[#d92686] text-[#d92686]"
                   xStart="0"
-                  xEnd={state.engagedViewsPeriod || "22 days"}
+                  xEnd={state.engagedWatchTimePeriod || "22 days"}
                   className="mt-4"
                 />
-              </Card>
-
-              {/* Card 3: Average percentage viewed */}
-              <Card className="min-w-[88%] shrink-0 snap-start p-4">
-                <EditableText
-                  value="Average percentage viewed"
-                  onSave={() => {}}
-                  className="text-[15px] text-muted-foreground font-medium block"
-                />
-                <div className="mt-0.5">
-                  <EditableText
-                    value={state.engagementAvgPctViewed || "61.0%"}
-                    onSave={(val) => updateField("engagementAvgPctViewed", val)}
-                    className="text-[32px] font-bold text-foreground leading-none block"
-                  />
-                </div>
-                <div className="mt-4 flex flex-col gap-2 pt-2 border-t border-border/60">
-                  <div className="flex justify-between text-[14px]">
-                    <span className="text-muted-foreground">Average view duration</span>
-                    <EditableText
-                      value={state.engagementAvgViewDuration || "0:05"}
-                      onSave={(val) => updateField("engagementAvgViewDuration", val)}
-                      className="font-bold text-foreground"
-                    />
-                  </div>
-                </div>
               </Card>
 
               {/* Card 4: Average view duration */}
@@ -551,17 +553,23 @@ export function VideoAnalyticsScreen({ onBack, initialTab = "Overview" }: VideoA
                 />
                 <div className="mt-0.5">
                   <EditableText
-                    value={state.engagementAvgViewDuration || "0:05"}
-                    onSave={(val) => updateField("engagementAvgViewDuration", val)}
+                    value={state.engagedAvgDuration || "0:14"}
+                    onSave={(val) => updateField("engagedAvgDuration", val)}
                     className="text-[32px] font-bold text-foreground leading-none block"
                   />
                 </div>
-                <div className="mt-4 flex flex-col gap-2 pt-2 border-t border-border/60">
-                  <div className="flex justify-between text-[14px]">
-                    <span className="text-muted-foreground">Lifetime</span>
-                    <span className="font-bold text-foreground">0:05</span>
-                  </div>
-                </div>
+                <LineChart
+                  points={state.engagedAvgDurationPoints}
+                  onPointsChange={(pts) => updateChartPoints("engagedAvgDurationPoints", pts)}
+                  gridlines={[0, 1, 2, 3]}
+                  gridLabel={(v: number) =>
+                    v === 3 ? "0:14" : v === 2 ? "0:09" : v === 1 ? "0:04" : "0:00"
+                  }
+                  colorClass="stroke-[#d92686] text-[#d92686]"
+                  xStart="0"
+                  xEnd={state.engagedAvgDurationPeriod || "22 days"}
+                  className="mt-4"
+                />
               </Card>
             </div>
             <Dots count={4} active={engagementCarouselIndex} />

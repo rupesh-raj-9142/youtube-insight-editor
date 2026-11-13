@@ -178,6 +178,16 @@ export interface StudioState {
   engagedViews: string;
   engagedViewsPeriod: string;
   engagedViewsPoints: ChartPoint[];
+  engagedUniqueViewers: string;
+  engagedUniqueViewersXStart: string;
+  engagedUniqueViewersXEnd: string;
+  engagedUniqueViewersPoints: ChartPoint[];
+  engagedWatchTime: string;
+  engagedWatchTimePeriod: string;
+  engagedWatchTimePoints: ChartPoint[];
+  engagedAvgDuration: string;
+  engagedAvgDurationPeriod: string;
+  engagedAvgDurationPoints: ChartPoint[];
   engagementHypeTitle: string;
   engagementHypeSubtitle: string;
   engagementHypePoints: string;
@@ -482,6 +492,32 @@ const getDefaultState = (): StudioState => ({
     [0.045, 2],
     [1, 2],
   ],
+  engagedUniqueViewers: "2",
+  engagedUniqueViewersXStart: "20 Oct",
+  engagedUniqueViewersXEnd: "12 Nov",
+  engagedUniqueViewersPoints: [
+    [0, 0],
+    [0.08, 1],
+    [0.15, 1],
+    [0.22, 0],
+    [1, 0],
+  ],
+  engagedWatchTime: "0.0",
+  engagedWatchTimePeriod: "22 days",
+  engagedWatchTimePoints: [
+    [0, 0],
+    [0.03, 0],
+    [0.04, 3],
+    [1, 3],
+  ],
+  engagedAvgDuration: "0:14",
+  engagedAvgDurationPeriod: "22 days",
+  engagedAvgDurationPoints: [
+    [0, 0],
+    [0.08, 3],
+    [0.15, 0],
+    [1, 0],
+  ],
   engagementHypeTitle: "Hype",
   engagementHypeSubtitle: "First 7 days",
   engagementHypePoints: "0",
@@ -529,7 +565,10 @@ interface StudioContextType {
       | "videoAnalyticsViewsPoints"
       | "videoAnalyticsShownInFeedPoints"
       | "reachViewsPoints"
-      | "engagedViewsPoints",
+      | "engagedViewsPoints"
+      | "engagedUniqueViewersPoints"
+      | "engagedWatchTimePoints"
+      | "engagedAvgDurationPoints",
     points: ChartPoint[]
   ) => void;
   removeVideo: (index: number) => void;
@@ -661,7 +700,10 @@ export function StudioProvider({ children }: { children: React.ReactNode }) {
       | "videoAnalyticsViewsPoints"
       | "videoAnalyticsShownInFeedPoints"
       | "reachViewsPoints"
-      | "engagedViewsPoints",
+      | "engagedViewsPoints"
+      | "engagedUniqueViewersPoints"
+      | "engagedWatchTimePoints"
+      | "engagedAvgDurationPoints",
     points: ChartPoint[]
   ) => {
     setState((prev) => ({ ...prev, [key]: points }));
